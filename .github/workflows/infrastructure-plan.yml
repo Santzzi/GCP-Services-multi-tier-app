@@ -55,6 +55,18 @@ jobs:
         working-directory: terraform/environments/dev
         run: terraform validate
 
+      - name: Check for and Remove Stale Lock
+        working-directory: terraform/environments/dev
+        run: |
+          # Check if the lock file exists in GCS
+          if gsutil ls "gs://gcp-track1-terraform-state/dev/terraform.tfstate/default.tflock" >/dev/null 2>&1; then
+            echo "Stale lock file found in GCS, attempting to remove..."
+            gsutil rm "gs://gcp-track1-terraform-state/dev/terraform.tfstate/default.tflock"
+            echo "Lock file removed"
+          else
+            echo "No lock file found in GCS"
+          fi
+
       - name: Terraform Plan
         working-directory: terraform/environments/dev
         run: |
