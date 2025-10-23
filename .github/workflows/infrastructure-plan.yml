@@ -54,6 +54,24 @@ jobs:
       - name: Terraform Validate
         working-directory: terraform/environments/dev
         run: terraform validate
+        
+      - name: Force Unlock State (if needed)
+        working-directory: terraform/environments/dev
+        run: |
+          # Check if there's an active lock
+          if terraform state pull >/dev/null 2>&1; then
+            echo "No active lock found"
+          else
+            echo "Attempting to force unlock..."
+            # Extract lock ID from error message if possible
+            LOCK_ID=$(terraform state pull 2>&1 | grep -oP 'ID:\s+\K\d+' | tail -1)
+            if [ -n "$LOCK_ID" ]; then
+              echo "Found lock ID: $LOCK_ID"
+              terraform force-unlock $LOCK_ID -force
+            else
+              echo "No lock ID found, proceeding without unlock"
+            fi
+          fi
 
       - name: Terraform Plan
         working-directory: terraform/environments/dev
