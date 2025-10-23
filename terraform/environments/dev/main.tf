@@ -18,7 +18,7 @@ resource "google_project" "dev_project" {
   name            = "DevOps Portfolio Dev"
   project_id      = "devops-portfolio-dev-${random_id.project_suffix.hex}"
   billing_account = var.billing_account
-  
+
   labels = {
     environment = "dev"
     project     = "devops-portfolio"
@@ -42,7 +42,7 @@ resource "google_project_service" "required_apis" {
     "logging.googleapis.com",
     "cloudbuild.googleapis.com"
   ])
-  
+
   project = google_project.dev_project.project_id
   service = each.value
 }
