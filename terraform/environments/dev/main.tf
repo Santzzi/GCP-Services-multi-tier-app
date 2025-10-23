@@ -1,13 +1,13 @@
 terraform {
   required_version = ">= 1.0"
-  
+
   required_providers {
     google = {
       source  = "hashicorp/google"
       version = "~> 5.0"
     }
   }
-  
+
   backend "gcs" {
     bucket = "gcp-track1-terraform-state"
     prefix = "dev/terraform.tfstate"
@@ -34,7 +34,7 @@ resource "google_project_service" "required_apis" {
     "servicenetworking.googleapis.com",
     "cloudresourcemanager.googleapis.com"
   ])
-  
+
   project            = var.project_id
   service            = each.value
   disable_on_destroy = false
@@ -43,9 +43,9 @@ resource "google_project_service" "required_apis" {
 # IAM Module
 module "iam" {
   source = "../../modules/iam"
-  
+
   project_id  = var.project_id
   environment = var.environment
-  
+
   depends_on = [google_project_service.required_apis]
 }
