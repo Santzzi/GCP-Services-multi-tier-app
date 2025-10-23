@@ -54,23 +54,17 @@ jobs:
       - name: Terraform Validate
         working-directory: terraform/environments/dev
         run: terraform validate
-        
-      - name: Force Unlock State (if needed)
+
+      - name: Check for and Remove Stale Lock
         working-directory: terraform/environments/dev
         run: |
-          # Check if there's an active lock
-          if terraform state pull >/dev/null 2>&1; then
-            echo "No active lock found"
+          # Check if the lock file exists in GCS
+          if gsutil ls "gs://gcp-track1-terraform-state/dev/terraform.tfstate/default.tflock" >/dev/null 2>&1; then
+            echo "Stale lock file found in GCS, attempting to remove..."
+            gsutil rm "gs://gcp-track1-terraform-state/dev/terraform.tfstate/default.tflock"
+            echo "Lock file removed"
           else
-            echo "Attempting to force unlock..."
-            # Extract lock ID from error message if possible
-            LOCK_ID=$(terraform state pull 2>&1 | grep -oP 'ID:\s+\K\d+' | tail -1)
-            if [ -n "$LOCK_ID" ]; then
-              echo "Found lock ID: $LOCK_ID"
-              terraform force-unlock $LOCK_ID -force
-            else
-              echo "No lock ID found, proceeding without unlock"
-            fi
+            echo "No lock file found in GCS"
           fi
 
       - name: Terraform Plan
