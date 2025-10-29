@@ -70,7 +70,7 @@ jobs:
       - name: Terraform Plan
         working-directory: terraform/environments/dev
         run: |
-          terraform plan -no-color -out=tfplan
+          terraform plan -no-color -out=tfplan -var="environment=dev" -lock-timeout=30s
           terraform show -no-color tfplan > plan.txt
 
       - name: Comment PR with Plan
