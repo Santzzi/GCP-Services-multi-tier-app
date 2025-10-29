@@ -70,8 +70,11 @@ jobs:
       - name: Terraform Plan
         working-directory: terraform/environments/dev
         run: |
-          cp ../../../.github/workflows/terraform.tfvars .
-          terraform plan -no-color -out=tfplan
+          terraform plan -no-color -out=tfplan \
+            -var="project_id=gcp-track1" \
+            -var="region=us-central1" \
+            -var="zone=us-central1-a" \
+            -var="environment=dev"
           terraform show -no-color tfplan > plan.txt
 
       - name: Comment PR with Plan

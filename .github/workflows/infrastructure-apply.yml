@@ -47,7 +47,12 @@ jobs:
 
       - name: Terraform Apply
         working-directory: terraform/environments/dev
-        run: terraform apply -auto-approve
+        run: |
+          terraform apply -auto-approve \
+            -var="project_id=gcp-track1" \
+            -var="region=us-central1" \
+            -var="zone=us-central1-a" \
+            -var="environment=dev"
 
       - name: Save Terraform Outputs
         working-directory: terraform/environments/dev
